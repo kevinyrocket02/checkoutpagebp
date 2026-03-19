@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: rgb(32, 182, 182);
+    --primary-dark: rgb(0, 150, 150);
+    --navy: rgb(13, 31, 46);
+    --blue: rgb(20, 138, 255);
+    --text: rgb(7, 31, 47);
+    --muted: rgb(77, 86, 99);
+    --border: #e0e0e0;
+    --bg: #fdfdfd;
+    --input-bg: #ffffff;
+    --radius-input: 11px;
+    --font-main: 'Montserrat', sans-serif;
+    --font-body: 'Montserrat', sans-serif;
+  }
+
+  html { font-size: 17px; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #ffffff;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── PAGE WRAPPER ── */
+  .page-wrap {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 0 80px;
+    background: #fff;
+  }
+
+  /* ── HEADER IMAGE (mobile banner) ── */
+  .mobile-banner {
+    width: 100%;
+    display: block;
+  }
+
+  /* ── CHECKOUT BODY ── */
+  .checkout-body {
+    padding: 0 16px;
+    margin-top: 16px;
+    position: relative;
+  }
+
+  /* ── EXPRESS CHECKOUT (Apple/Google Pay) ── */
+  .express-section {
+    margin-bottom: 16px;
+  }
+  .express-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 4px;
+    border: none;
+    margin-bottom: 8px;
+    font-family: var(--font-main);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.15s;
+  }
+  .express-btn:hover { opacity: 0.88; }
+  .apple-pay-btn {
+    background: #000;
+    color: #fff;
+    font-size: 17px;
+    letter-spacing: 0.5px;
+    display: none !important;
+  }
+  .google-pay-btn {
+    background: #fff;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+  }
+  .g-logo { width: 18px; height: 18px; }
+
+  .or-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0 16px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .or-divider::before, .or-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── FORM SECTIONS ── */
+  .form-label-container {
+    margin-bottom: 14px;
+  }
+  .form-label {
+    font-family: var(--font-main);
+    font-size: 16px;
+    font-weight: 700;
+    color: #0a1628;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-label-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  /* Stripe-style floating label inputs */
+  .stripe-input-wrap {
+    position: relative;
+    border: 1px solid #c8cdd6;
+    border-radius: var(--radius-input);
+    background: var(--input-bg);
+    transition: border-color 0.15s;
+    min-height: 58px;
+    padding: 0 14px;
+  }
+  .stripe-input-wrap:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(20,138,255,0.1);
+  }
+  .stripe-input-wrap label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+    pointer-events: none;
+    transition: all 0.18s ease;
+    background: transparent;
+    line-height: 1;
+  }
+  /* Floated state — via class or :focus-within + has value */
+  .stripe-input-wrap.filled label,
+  .stripe-input-wrap:focus-within label {
+    top: 10px;
+    transform: translateY(0);
+    font-size: 11px;
+    color: #5a6375;
+    font-weight: 500;
+  }
+  .stripe-input-wrap input,
+  .stripe-input-wrap select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    color: #0d1f2e;
+    width: 100%;
+    padding: 24px 0 8px;
+    appearance: none;
+  }
+  .stripe-input-wrap input::placeholder { color: transparent; }
+  #card-number:focus::placeholder,
+  #expiry:focus::placeholder,
+  #cvv:focus::placeholder { color: #9aa0ad; }
+  .stripe-input-wrap select option { color: #0d1f2e; }
+
+  /* Phone prefix row */
+  .phone-row { display: flex; gap: 0; }
+  .phone-prefix-wrap {
+    border: 1px solid #c8cdd6;
+    border-right: none;
+    border-radius: var(--radius-input) 0 0 var(--radius-input);
+    background: #f4f5f7;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
+    position: relative;
+  }
+  .phone-prefix-wrap:focus-within { border-color: var(--blue); }
+  .phone-flag { font-size: 20px; line-height: 1; }
+  .phone-code {
+    font-family: var(--font-main);
+    font-size: 15px;
+    font-weight: 600;
+    color: #0d1f2e;
+    white-space: nowrap;
+  }
+  .phone-input-wrap {
+    flex: 1;
+    border: 1px solid #c8cdd6;
+    border-left: none;
+    border-radius: 0 var(--radius-input) var(--radius-input) 0;
+    background: #fff;
+    min-height: 58px;
+    position: relative;
+    padding: 0 14px;
+  }
+  .phone-input-wrap:focus-within { border-color: var(--blue); }
+  .phone-input-wrap label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+    pointer-events: none;
+    transition: all 0.18s ease;
+  }
+  .phone-input-wrap.filled label,
+  .phone-input-wrap:focus-within label {
+    top: 10px;
+    transform: translateY(0);
+    font-size: 11px;
+    color: #5a6375;
+  }
+  .phone-input-wrap input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 500;
+    color: #0d1f2e;
+    width: 100%;
+    padding: 24px 0 8px;
+  }
+  .phone-input-wrap input::placeholder { color: transparent; }
+
+  /* Address autocomplete dropdown */
+  .autocomplete-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: #fff;
+    border: 1px solid #c8cdd6;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 100;
+    overflow: hidden;
+    display: none;
+  }
+  .autocomplete-dropdown.show { display: block; }
+  .autocomplete-item {
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    color: #0d1f2e;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .autocomplete-item:last-child { border-bottom: none; }
+  .autocomplete-item:hover { background: #f4f7ff; }
+  .autocomplete-icon { color: #888; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .autocomplete-main { font-weight: 600; font-size: 14px; }
+  .autocomplete-sub { font-size: 12px; color: #666; margin-top: 1px; }
+
+  /* Hidden extra fields */
+  .extra-fields { display: none; }
+  .extra-fields.visible { display: block; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* ── PAYMENT METHOD TABS ── */
+  .payment-method-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .pm-tab {
+    flex: 1;
+    height: 42px;
+    border: none;
+    background: #f8f8f8;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-right: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .pm-tab:last-child { border-right: none; }
+  .pm-tab.active {
+    background: #fff;
+    color: var(--text);
+    box-shadow: inset 0 -2px 0 var(--primary);
+  }
+
+  /* ── PIX BLOCK ── */
+  .pix-block {
+    border: 1px solid #c3e6cb;
+    background: #f0faf6;
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .pix-icon-wrap {
+    width: 44px;
+    height: 44px;
+    background: #32bcad;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pix-icon-wrap svg { width: 26px; height: 26px; fill: #fff; }
+  .pix-block h4 {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .pix-block p { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+  /* ── SUBMIT BUTTON ── */
+  .submit-wrap {
+    margin-top: 20px;
+  }
+  .submit-btn {
+    width: 100%;
+    height: 56px;
+    background: var(--primary);
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.15s;
+    letter-spacing: 0.3px;
+  }
+  .submit-btn:hover { background: var(--primary-dark); }
+  .submit-btn svg { width: 22px; height: 22px; fill: #fff; }
+
+  .disclaimer {
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 16px 24px;
+    text-align: center;
+  }
+  .footer-logo {
+    width: 102px;
+    height: auto;
+    display: block;
+  }
+  .footer-text {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: center;
+    font-size: 10px;
+  }
+  .footer-text a { color: var(--blue); text-decoration: none; }
+
+  /* General error */
+  .general-error {
+    background: #fff3f3;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: #721c24;
+  }
+
+  @media (max-width: 360px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  /* ── FIELD ERROR STATES ── */
+  .stripe-input-wrap.has-error,
+  .phone-input-wrap.has-error { border-color: #e53e3e !important; }
+  .field-error-msg {
+    color: #e53e3e;
+    font-size: 11px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    margin-top: 4px;
+    padding-left: 2px;
+    display: none;
+  }
+  .field-error-msg.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- Mobile banner image -->
+  <img class="mobile-banner"
+    src="https://images.clickfunnels.com/cdn-cgi/image/width=1000px,fit=scale-down,f=auto,q=80/https://statics.myclickfunnels.com/workspace/JEydXd/image/20652587/file/f3731fb979f7c689ee0ffc0dd31402eb.png"
+    alt="TV Biblo Annual"
+    onerror="this.style.display='none'">
+
+  <div class="checkout-body">
+
+
+
+    <!-- Email -->
+    <div class="form-group">
+      <div class="stripe-input-wrap" id="wrap-email">
+        <label>Email *</label>
+        <input type="email" id="email" placeholder="" required>
+      </div>
+      <div class="field-error-msg" id="err-email">Please enter a valid email address.</div>
+    </div>
+
+    <!-- Billing Information -->
+    <div class="form-label-container">
+      <div class="form-label">Billing Information</div>
+      <hr class="form-label-divider">
+    </div>
+
+    <div class="form-row" style="margin-bottom:4px">
+      <div>
+        <div class="stripe-input-wrap" id="wrap-first-name">
+          <label>First name *</label>
+          <input type="text" id="first-name" placeholder="" required>
+        </div>
+        <div class="field-error-msg" id="err-first-name">Required.</div>
+      </div>
+      <div>
+        <div class="stripe-input-wrap" id="wrap-last-name">
+          <label>Last name *</label>
+          <input type="text" id="last-name" placeholder="" required>
+        </div>
+        <div class="field-error-msg" id="err-last-name">Required.</div>
+      </div>
+    </div>
+    <div style="margin-bottom:12px"></div>
+
+    <div class="form-group">
+      <div class="stripe-input-wrap filled" id="country-wrap">
+        <label>Country or region *</label>
+        <select id="country" required>
+          <option value="US" selected>United States</option>
+          <option value="BR">Brazil</option>
+          <option value="GB">United Kingdom</option>
+          <option value="CA">Canada</option>
+          <option value="AU">Australia</option>
+          <option value="PT">Portugal</option>
+          <option value="ES">Spain</option>
+          <option value="MX">Mexico</option>
+          <option value="CO">Colombia</option>
+          <option value="AR">Argentina</option>
+          <option value="DE">Germany</option>
+          <option value="FR">France</option>
+          <option value="IT">Italy</option>
+          <option value="JP">Japan</option>
+          <option value="KR">South Korea</option>
+          <option value="IN">India</option>
+          <option value="ZA">South Africa</option>
+          <option value="NG">Nigeria</option>
+          <option value="GH">Ghana</option>
+          <option value="KE">Kenya</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Address with autocomplete -->
+    <div class="form-group" style="position:relative">
+      <div class="stripe-input-wrap" id="wrap-address1" style="position:relative">
+        <label>Address *</label>
+        <input type="text" id="address1" placeholder="" required autocomplete="off">
+      </div>
+      <div class="autocomplete-dropdown" id="autocomplete-dropdown"></div>
+      <div class="field-error-msg" id="err-address1">Please enter your address.</div>
+    </div>
+
+    <!-- Extra address fields (revealed after address entered) -->
+    <div class="extra-fields" id="extra-fields">
+      <div class="form-group">
+        <div class="stripe-input-wrap">
+          <label>Address line 2</label>
+          <input type="text" id="address2" placeholder="">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="stripe-input-wrap" id="wrap-city">
+          <label>City *</label>
+          <input type="text" id="city" placeholder="" required>
+        </div>
+        <div class="field-error-msg" id="err-city">Required.</div>
+      </div>
+      <div class="form-row" style="margin-bottom:4px">
+        <div>
+          <div class="stripe-input-wrap" id="wrap-state">
+            <label>State *</label>
+            <input type="text" id="state" placeholder="" required>
+          </div>
+          <div class="field-error-msg" id="err-state">Required.</div>
+        </div>
+        <div>
+          <div class="stripe-input-wrap" id="wrap-postal">
+            <label>Postal code *</label>
+            <input type="text" id="postal" placeholder="" required>
+          </div>
+          <div class="field-error-msg" id="err-postal">Required.</div>
+        </div>
+      </div>
+      <div style="margin-bottom:12px"></div>
+      <!-- Phone with country prefix -->
+      <div class="form-group">
+        <div class="phone-row">
+          <div class="phone-prefix-wrap" id="phone-prefix-wrap">
+            <span class="phone-flag" id="phone-flag">🇺🇸</span>
+            <span class="phone-code" id="phone-code">+1</span>
+          </div>
+          <div class="phone-input-wrap" id="wrap-phone">
+            <label>Phone number *</label>
+            <input type="tel" id="phone" placeholder="" required>
+          </div>
+        </div>
+        <div class="field-error-msg" id="err-phone">Required.</div>
+      </div>
+    </div>
+
+    <!-- Payment Information -->
+    <div class="form-label-container" style="margin-top:18px">
+      <div class="form-label">Payment Information</div>
+      <hr class="form-label-divider">
+    </div>
+
+    <!-- Card fields -->
+    <div id="pay-card">
+      <div class="form-group">
+        <div class="stripe-input-wrap" id="wrap-card-number" style="position:relative">
+          <label>Card Number</label>
+          <input type="text" id="card-number" placeholder="1234 1234 1234 1234" maxlength="19" inputmode="numeric" style="padding-right: 70px; letter-spacing: 1px;" required>
+          <div id="card-icon-area" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); display:flex; gap:4px; align-items:center;">
+            <div id="icon-visa" style="background:#1a1f71;color:#fff;font-size:7px;font-weight:800;letter-spacing:1px;padding:3px 5px;border-radius:3px;transition:opacity 0.2s;">VISA</div>
+            <div id="icon-mc" style="position:relative;width:26px;height:17px;display:flex;align-items:center;transition:opacity 0.2s;">
+              <div style="width:13px;height:13px;border-radius:50%;background:#eb001b;position:absolute;left:0;"></div>
+              <div style="width:13px;height:13px;border-radius:50%;background:#f79e1b;position:absolute;right:0;opacity:0.9;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="field-error-msg" id="err-card-number">Please enter your card number.</div>
+      </div>
+      <div id="card-error" style="display:none;color:#e53e3e;font-size:12px;font-family:'Montserrat',sans-serif;margin-top:-6px;margin-bottom:8px;padding-left:2px;"></div>
+
+      <div class="form-row" style="margin-bottom:4px">
+        <div>
+          <div class="stripe-input-wrap" id="wrap-expiry">
+            <label>Expiry date *</label>
+            <input type="text" id="expiry" placeholder="MM / YY" maxlength="7" required>
+          </div>
+          <div class="field-error-msg" id="err-expiry">Required.</div>
+        </div>
+        <div>
+          <div class="stripe-input-wrap" id="wrap-cvv">
+            <label>Security code *</label>
+            <input type="text" id="cvv" placeholder="CVV" maxlength="4" required>
+          </div>
+          <div class="field-error-msg" id="err-cvv">Required.</div>
+        </div>
+      </div>
+      <div style="margin-bottom:12px"></div>
+    </div>
+
+
+
+    <!-- General error -->
+    <div class="general-error" id="general-error">
+      <i>ℹ</i> <span>Something went wrong. Please try again.</span>
+    </div>
+
+    <!-- Submit -->
+    <div class="submit-wrap">
+      <button class="submit-btn" type="button" onclick="handleSubmit()">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="white"/><polyline points="12 8 16 12 12 16" stroke="rgb(32,182,182)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="12" x2="16" y2="12" stroke="rgb(32,182,182)" stroke-width="2.2" stroke-linecap="round"/></svg>
+        SUBSCRIBE
+      </button>
+    </div>
+
+    <p class="disclaimer">We Never Share Your Information With Anyone</p>
+
+    <img src="https://images.clickfunnels.com/cdn-cgi/image/fit=scale-down,f=auto,q=80/https://statics.myclickfunnels.com/workspace/JEydXd/image/20527684/file/8f390a1591c7000825bc3334f74ddffd.png"
+      alt="Security badges"
+      style="width:100%; display:block; margin-top:14px; border-radius:8px;"
+      onerror="this.style.display='none'">
+
+  </div>
+
+  <!-- Footer -->
+  <div class="page-footer">
+    <img class="footer-logo"
+      src="https://images.clickfunnels.com/cdn-cgi/image/width=1000px,fit=scale-down,f=auto,q=80/https://statics.myclickfunnels.com/workspace/JEydXd/image/20540904/file/f5761120f6659c2492fd38fd8aa9aef8.png"
+      alt="TV Biblo logo"
+      onerror="this.style.display='none'">
+    <div class="footer-text">
+      Copyright © 2024 Biblo | All Rights Reserved.<br>
+      By completing this purchase, you agree to our
+      <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── FLOATING LABEL: toggle .filled when input has value ──
+function updateFilled(el) {
+  const wrap = el.closest('.stripe-input-wrap, .phone-input-wrap');
+  if (!wrap) return;
+  if (el.value && el.value !== '') {
+    wrap.classList.add('filled');
+  } else {
+    wrap.classList.remove('filled');
+  }
+}
+
+document.addEventListener('input', e => {
+  if (e.target.matches('input, select')) updateFilled(e.target);
+});
+document.addEventListener('change', e => {
+  if (e.target.matches('select')) updateFilled(e.target);
+});
+// Init on load for any pre-filled fields
+document.querySelectorAll('input, select').forEach(updateFilled);
+const phonePrefixes = {
+  US:{code:'+1',flag:'🇺🇸'}, BR:{code:'+55',flag:'🇧🇷'}, GB:{code:'+44',flag:'🇬🇧'},
+  CA:{code:'+1',flag:'🇨🇦'}, AU:{code:'+61',flag:'🇦🇺'}, PT:{code:'+351',flag:'🇵🇹'},
+  ES:{code:'+34',flag:'🇪🇸'}, MX:{code:'+52',flag:'🇲🇽'}, CO:{code:'+57',flag:'🇨🇴'},
+  AR:{code:'+54',flag:'🇦🇷'}, DE:{code:'+49',flag:'🇩🇪'}, FR:{code:'+33',flag:'🇫🇷'},
+  IT:{code:'+39',flag:'🇮🇹'}, JP:{code:'+81',flag:'🇯🇵'}, KR:{code:'+82',flag:'🇰🇷'},
+  IN:{code:'+91',flag:'🇮🇳'}, ZA:{code:'+27',flag:'🇿🇦'}, NG:{code:'+234',flag:'🇳🇬'},
+  GH:{code:'+233',flag:'🇬🇭'}, KE:{code:'+254',flag:'🇰🇪'}
+};
+
+function setPhonePrefix(countryCode) {
+  const p = phonePrefixes[countryCode] || {code:'+1', flag:'🌐'};
+  document.getElementById('phone-flag').textContent = p.flag;
+  document.getElementById('phone-code').textContent = p.code;
+}
+
+// ── DETECT COUNTRY BY IP ──
+async function detectCountryByIP() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    const cc = data.country_code || 'US';
+    const sel = document.getElementById('country');
+    if (sel.querySelector(`option[value="${cc}"]`)) {
+      sel.value = cc;
+    } else {
+      sel.value = 'US';
+    }
+    setPhonePrefix(sel.value);
+    // Mark country wrap as filled so label stays small
+    document.getElementById('country-wrap').classList.add('filled');
+  } catch(e) {
+    document.getElementById('country').value = 'US';
+    document.getElementById('country-wrap').classList.add('filled');
+    setPhonePrefix('US');
+  }
+}
+detectCountryByIP();
+
+// Sync phone prefix when country changes manually
+document.getElementById('country').addEventListener('change', function() {
+  setPhonePrefix(this.value);
+});
+
+// ── ADDRESS AUTOCOMPLETE via Nominatim (OpenStreetMap) ──
+const addressInput = document.getElementById('address1');
+const dropdown = document.getElementById('autocomplete-dropdown');
+const extraFields = document.getElementById('extra-fields');
+let debounceTimer;
+
+addressInput.addEventListener('input', function() {
+  const q = this.value.trim();
+  if (q.length < 4) { dropdown.classList.remove('show'); return; }
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => fetchSuggestions(q), 350);
+});
+
+addressInput.addEventListener('focus', function() {
+  // Show extra fields as soon as user starts typing
+  if (this.value.trim().length > 0) extraFields.classList.add('visible');
+});
+
+async function fetchSuggestions(query) {
+  try {
+    const country = document.getElementById('country').value;
+    const cc = country ? `&countrycodes=${country.toLowerCase()}` : '';
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}${cc}&format=json&addressdetails=1&limit=5`;
+    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    const data = await res.json();
+    renderDropdown(data);
+  } catch(e) { dropdown.classList.remove('show'); }
+}
+
+function renderDropdown(results) {
+  if (!results.length) { dropdown.classList.remove('show'); return; }
+  dropdown.innerHTML = results.map((r, i) => {
+    const a = r.address || {};
+    const main = a.road ? (a.house_number ? a.house_number + ' ' + a.road : a.road) : r.display_name.split(',')[0];
+    const sub = [a.city || a.town || a.village || a.county, a.state, a.country].filter(Boolean).join(', ');
+    return `<div class="autocomplete-item" data-idx="${i}">
+      <span class="autocomplete-icon">📍</span>
+      <div><div class="autocomplete-main">${main}</div><div class="autocomplete-sub">${sub}</div></div>
+    </div>`;
+  }).join('');
+  dropdown._results = results;
+  dropdown.classList.add('show');
+  dropdown.querySelectorAll('.autocomplete-item').forEach(el => {
+    el.addEventListener('click', function() {
+      const r = dropdown._results[+this.dataset.idx];
+      fillAddress(r);
+      dropdown.classList.remove('show');
+    });
+  });
+}
+
+function fillAddress(r) {
+  const a = r.address || {};
+  const road = a.road || '';
+  const num = a.house_number || '';
+  addressInput.value = num ? num + ' ' + road : road;
+  extraFields.classList.add('visible');
+  if (a.suburb || a.neighbourhood) {
+    document.getElementById('address2').value = a.suburb || a.neighbourhood;
+  }
+  document.getElementById('city').value = a.city || a.town || a.village || a.county || '';
+  document.getElementById('state').value = a.state || '';
+  document.getElementById('postal').value = a.postcode || '';
+  // Set country if found
+  const cc = (a.country_code || '').toUpperCase();
+  const sel = document.getElementById('country');
+  if (cc && sel.querySelector(`option[value="${cc}"]`)) {
+    sel.value = cc;
+    setPhonePrefix(cc);
+  }
+}
+
+// Show extra fields when address typed manually (without autocomplete)
+addressInput.addEventListener('blur', function() {
+  if (this.value.trim().length > 2) extraFields.classList.add('visible');
+});
+
+// ── LUHN ALGORITHM ──
+function luhn(num) {
+  const digits = num.replace(/\s/g, '');
+  let sum = 0, alt = false;
+  for (let i = digits.length - 1; i >= 0; i--) {
+    let n = parseInt(digits[i], 10);
+    if (alt) { n *= 2; if (n > 9) n -= 9; }
+    sum += n;
+    alt = !alt;
+  }
+  return sum % 10 === 0;
+}
+
+// ── CARD BRAND DETECTION ──
+function detectBrand(num) {
+  const d = num.replace(/\s/g, '');
+  if (/^4/.test(d))                          return 'visa';
+  if (/^5[1-5]/.test(d) || /^2[2-7]/.test(d)) return 'mastercard';
+  if (/^3[47]/.test(d))                      return 'amex';
+  if (/^(636368|438935|504175|451416|636297|5067|4576|4011)/.test(d)) return 'elo';
+  if (/^(606282|3841)/.test(d))              return 'hipercard';
+  return null;
+}
+
+const brandIcons = {
+  visa:       `<div id="icon-visa" style="background:#1a1f71;color:#fff;font-size:7px;font-weight:800;letter-spacing:1px;padding:3px 6px;border-radius:3px;">VISA</div>`,
+  mastercard: `<div id="icon-mc" style="position:relative;width:28px;height:18px;display:flex;align-items:center;"><div style="width:14px;height:14px;border-radius:50%;background:#eb001b;position:absolute;left:0;"></div><div style="width:14px;height:14px;border-radius:50%;background:#f79e1b;position:absolute;right:0;opacity:0.9;"></div></div>`,
+  amex:       `<div style="background:#007bc1;color:#fff;font-size:7px;font-weight:800;letter-spacing:0.5px;padding:3px 5px;border-radius:3px;">AMEX</div>`,
+  elo:        `<div style="background:#000;color:#FFD700;font-size:7px;font-weight:900;letter-spacing:0.5px;padding:3px 5px;border-radius:3px;">ELO</div>`,
+  hipercard:  `<div style="background:#b3131b;color:#fff;font-size:6px;font-weight:800;letter-spacing:0.3px;padding:3px 4px;border-radius:3px;">HIPER</div>`,
+};
+
+// ── CARD NUMBER FORMAT + VALIDATION ──
+document.getElementById('card-number').addEventListener('input', function() {
+  const brand = detectBrand(this.value);
+  const maxLen = brand === 'amex' ? 15 : 16;
+  const groupSize = brand === 'amex' ? [4, 6, 5] : [4, 4, 4, 4];
+
+  let raw = this.value.replace(/\D/g, '').slice(0, maxLen);
+  // Format with spaces per group
+  let formatted = '', pos = 0;
+  for (let g of groupSize) {
+    if (pos >= raw.length) break;
+    if (pos > 0) formatted += ' ';
+    formatted += raw.slice(pos, pos + g);
+    pos += g;
+  }
+  this.value = formatted;
+  updateFilled(this);
+
+  // Update brand icon area
+  const iconArea = document.getElementById('card-icon-area');
+  if (brand && brandIcons[brand]) {
+    iconArea.innerHTML = brandIcons[brand];
+  } else {
+    iconArea.innerHTML = `
+      <div id="icon-visa" style="background:#1a1f71;color:#fff;font-size:7px;font-weight:800;letter-spacing:1px;padding:3px 5px;border-radius:3px;">VISA</div>
+      <div id="icon-mc" style="position:relative;width:26px;height:17px;display:flex;align-items:center;">
+        <div style="width:13px;height:13px;border-radius:50%;background:#eb001b;position:absolute;left:0;"></div>
+        <div style="width:13px;height:13px;border-radius:50%;background:#f79e1b;position:absolute;right:0;opacity:0.9;"></div>
+      </div>`;
+  }
+
+  // Luhn validation when number is complete
+  const cardWrap = this.closest('.stripe-input-wrap');
+  const errorEl  = document.getElementById('card-error');
+  const digits   = raw.length;
+  if (digits === maxLen) {
+    if (!luhn(raw)) {
+      cardWrap.style.borderColor = '#e53e3e';
+      errorEl.style.display = 'block';
+      errorEl.textContent = 'Invalid card number. Please check and try again.';
+    } else {
+      cardWrap.style.borderColor = '#38a169';
+      errorEl.style.display = 'none';
+    }
+  } else {
+    cardWrap.style.borderColor = '#c8cdd6';
+    errorEl.style.display = 'none';
+  }
+});
+
+// ── CARD HOLDER NAME: auto-built from First + Last name ──
+function updateCardName() {
+  const first = document.getElementById('first-name')?.value || '';
+  const last  = document.getElementById('last-name')?.value  || '';
+  const cardName = document.getElementById('card-holder-name');
+  if (cardName) cardName.value = (first + ' ' + last).trim();
+}
+document.getElementById('first-name').addEventListener('input', updateCardName);
+document.getElementById('last-name').addEventListener('input', updateCardName);
+document.getElementById('expiry').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '').slice(0, 4);
+  if (v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
+  this.value = v;
+  updateFilled(this);
+});
+
+// ── CVV: digits only, max 4 ──
+document.getElementById('cvv').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').slice(0, 4);
+  updateFilled(this);
+});
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#wrap-address1') && !e.target.closest('#autocomplete-dropdown')) {
+    dropdown.classList.remove('show');
+  }
+});
+
+// ── FORM VALIDATION ──
+function setFieldError(wrapId, errId, show, msg) {
+  const wrap = document.getElementById(wrapId);
+  const err  = document.getElementById(errId);
+  if (!wrap || !err) return;
+  if (show) {
+    wrap.classList.add('has-error');
+    if (msg) err.textContent = msg;
+    err.classList.add('show');
+  } else {
+    wrap.classList.remove('has-error');
+    err.classList.remove('show');
+  }
+}
+
+function clearAllErrors() {
+  document.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+  document.querySelectorAll('.field-error-msg').forEach(el => el.classList.remove('show'));
+}
+
+function handleSubmit() {
+  clearAllErrors();
+  document.getElementById('extra-fields').classList.add('visible');
+  let firstError = null;
+  let valid = true;
+
+  function check(wrapId, errId, value, msg) {
+    if (!value || !value.trim()) {
+      setFieldError(wrapId, errId, true, msg);
+      if (!firstError) firstError = document.getElementById(wrapId);
+      valid = false;
+    }
+  }
+
+  const email = document.getElementById('email').value;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setFieldError('wrap-email', 'err-email', true, 'Please enter a valid email address.');
+    if (!firstError) firstError = document.getElementById('wrap-email');
+    valid = false;
+  }
+
+  check('wrap-first-name', 'err-first-name', document.getElementById('first-name').value, 'First name is required.');
+  check('wrap-last-name',  'err-last-name',  document.getElementById('last-name').value,  'Last name is required.');
+  check('wrap-address1',   'err-address1',   document.getElementById('address1').value,   'Please enter your address.');
+  check('wrap-city',       'err-city',       document.getElementById('city').value,        'City is required.');
+  check('wrap-state',      'err-state',      document.getElementById('state').value,       'State is required.');
+  check('wrap-postal',     'err-postal',     document.getElementById('postal').value,      'Postal code is required.');
+  check('wrap-phone',      'err-phone',      document.getElementById('phone').value,       'Phone number is required.');
+
+  const cardRaw = document.getElementById('card-number').value.replace(/\s/g, '');
+  if (!cardRaw) {
+    setFieldError('wrap-card-number', 'err-card-number', true, 'Please enter your card number.');
+    if (!firstError) firstError = document.getElementById('wrap-card-number');
+    valid = false;
+  } else if (!luhn(cardRaw)) {
+    setFieldError('wrap-card-number', 'err-card-number', true, 'Invalid card number. Please check and try again.');
+    if (!firstError) firstError = document.getElementById('wrap-card-number');
+    valid = false;
+  }
+
+  const expiry = document.getElementById('expiry').value.replace(/\s/g,'');
+  if (!expiry || expiry.replace('/','').length < 4) {
+    setFieldError('wrap-expiry', 'err-expiry', true, 'Please enter expiry date (MM/YY).');
+    if (!firstError) firstError = document.getElementById('wrap-expiry');
+    valid = false;
+  }
+
+  const cvv = document.getElementById('cvv').value;
+  if (!cvv || cvv.length < 3) {
+    setFieldError('wrap-cvv', 'err-cvv', true, 'Please enter your security code.');
+    if (!firstError) firstError = document.getElementById('wrap-cvv');
+    valid = false;
+  }
+
+  if (!valid && firstError) {
+    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  console.log('✅ Form valid — ready to submit to payment gateway');
+}
+
+// Clear individual field error when user types
+document.addEventListener('input', e => {
+  const wrap = e.target.closest('[id^="wrap-"]');
+  if (wrap) {
+    wrap.classList.remove('has-error');
+    const errId = 'err-' + wrap.id.replace('wrap-', '');
+    const err = document.getElementById(errId);
+    if (err) err.classList.remove('show');
+  }
+});
+document.addEventListener('change', e => {
+  const wrap = e.target.closest('[id^="wrap-"]');
+  if (wrap) {
+    wrap.classList.remove('has-error');
+    const errId = 'err-' + wrap.id.replace('wrap-', '');
+    const err = document.getElementById(errId);
+    if (err) err.classList.remove('show');
+  }
+});
+</script>
+</body></html>
