@@ -930,7 +930,7 @@ function clearAllErrors() {
   document.querySelectorAll('.field-error-msg').forEach(el => el.classList.remove('show'));
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   clearAllErrors();
   document.getElementById('extra-fields').classList.add('visible');
   let firstError = null;
@@ -989,7 +989,59 @@ function handleSubmit() {
     return;
   }
 
-  console.log('✅ Form valid — ready to submit to payment gateway');
+  // ── SUBMIT TO DODO PAYMENTS ──
+  const btn = document.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" stroke-dasharray="40" stroke-dashoffset="10"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></circle></svg> Processing...`;
+
+  try {
+    const [expMonth, expYear] = document.getElementById('expiry').value.split('/').map(s => s.trim());
+    const fullName = (document.getElementById('first-name').value + ' ' + document.getElementById('last-name').value).trim();
+
+    const payload = {
+      billing: {
+        city:    document.getElementById('city').value,
+        country: document.getElementById('country').value,
+        state:   document.getElementById('state').value,
+        street:  document.getElementById('address1').value,
+        zipcode: document.getElementById('postal').value,
+      },
+      customer: {
+        email: document.getElementById('email').value,
+        name:  fullName,
+        phone_number: document.getElementById('phone-code').textContent + document.getElementById('phone').value,
+      },
+      product_cart: [{ product_id: 'pdt_0NarcUceo6zuLC9nxtzZ4', quantity: 1 }],
+      payment_link: true,
+      return_url: 'https://kevinyrocket02.github.io/checkoutpagebp',
+    };
+
+    const res = await fetch('/api/create-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    console.log('Dodo response:', data);
+
+    if (data.payment_link) {
+      window.location.href = data.payment_link;
+    } else if (data.error || data.message) {
+      throw new Error(data.error || data.message);
+    } else {
+      throw new Error('Unexpected response from payment gateway.');
+    }
+  } catch (err) {
+    console.error('Payment error:', err);
+    const generalError = document.getElementById('general-error');
+    generalError.style.display = 'flex';
+    generalError.querySelector('span').textContent = 'Payment failed: ' + err.message;
+    btn.disabled = false;
+    btn.innerHTML = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="white"/><polyline points="12 8 16 12 12 16" stroke="rgb(32,182,182)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="12" x2="16" y2="12" stroke="rgb(32,182,182)" stroke-width="2.2" stroke-linecap="round"/></svg> SUBSCRIBE`;
+  }
 }
 
 // Clear individual field error when user types
