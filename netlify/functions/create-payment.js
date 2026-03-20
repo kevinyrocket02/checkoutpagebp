@@ -6,7 +6,7 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
 
-    const response = await fetch('https://test.dodopayments.com/payments', {
+    const response = await fetch('https://live.dodopayments.com/payments', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
